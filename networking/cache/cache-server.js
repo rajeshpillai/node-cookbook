@@ -12,9 +12,16 @@ function getLockForKey(key) {
   return keyLocks.get(key);
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
 const server = net.createServer(async (socket) => {
   socket.on("data", async (data) => {
-    const [command, key, ...valueParts] = data.toString().trim().split(" ");
+    console.log(`Received data: ${data}`);
+    // First split to separate the ID from the rest of the command
+    const [id, command, key, ...valueParts] = data.toString().trim().split(" ");
     const value = valueParts.join(" "); // Re-join the remaining parts for the value
 
     switch (command) {
@@ -24,32 +31,41 @@ const server = net.createServer(async (socket) => {
           const release = await lock.acquire();
           try {
             dataStore[key] = value;
-            socket.write("OK\n");
+            console.log(`Adding ${key} with ID ${id} to the data store`);
+            // Include the ID in the response
+            socket.write(`${id} OK\n`);
           } finally {
+            console.log(`Releasing lock for ${key}`);
             release();
           }
         } catch (error) {
           console.error("Error handling SET command:", error);
-          socket.write("ERROR\n");
+          // Include the ID in the error response
+          socket.write(`${id} ERROR\n`);
         }
         break;
       case "GET":
         try {
           const lock = getLockForKey(key);
+          console.log(`Getting ${key} for ${id} from the data store`);
           const release = await lock.acquire();
           try {
             const storedValue = dataStore[key] || "NOT FOUND";
-            socket.write(`${storedValue}\n`);
+            console.log(`Retrieved ${key} with ID ${id} from the data store`);
+            // Include the ID in the response
+            socket.write(`${id} OK ${storedValue}\n`);
           } finally {
             release();
           }
         } catch (error) {
           console.error("Error handling GET command:", error);
-          socket.write("ERROR\n");
+          // Include the ID in the error response
+          socket.write(`${id} ERROR\n`);
         }
         break;
       default:
-        socket.write("Unknown command\n");
+        // Include the ID in the unknown command response
+        socket.write(`${id} Unknown command ${command}\n`);
     }
   });
 });
