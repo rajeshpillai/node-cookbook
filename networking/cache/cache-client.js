@@ -6,19 +6,16 @@ class CacheClient {
         this.port = port;
     }
 
-    connect() {
+    // Use async keyword to denote an asynchronous function
+    async connect() {
         return new Promise((resolve, reject) => {
-            this.client = net.createConnection({ host: this.host, port: this.port }, () => {
-                resolve();
-            });
-
-            this.client.on('error', (err) => {
-                reject(err);
-            });
+            this.client = net.createConnection({ host: this.host, port: this.port }, resolve);
+            this.client.on('error', reject);
         });
     }
 
-    sendCommand(command) {
+    // Mark sendCommand as async and utilize await within
+    async sendCommand(command) {
         return new Promise((resolve, reject) => {
             this.client.once('data', (data) => {
                 resolve(data.toString().trim());
@@ -28,26 +25,29 @@ class CacheClient {
         });
     }
 
+    // The method for converting input to string doesn't need to be async as it's a synchronous operation
     #convertInputToString(input) {
-      if (Array.isArray(input)) {
-        return input;
-      } else if (typeof input === 'object' && input !== null) {
-          return JSON.stringify(input);
-      } else {
-          return typeof input;
-      }
-    }
-    set(key, value) {
-      const safe_value = this.#convertInputToString(value);
-      return this.sendCommand(`SET ${key} ${safe_value}`);
+        if (Array.isArray(input)) {
+            return JSON.stringify(input);
+        } else if (typeof input === 'object' && input !== null) {
+            return JSON.stringify(input);
+        } else {
+            return input.toString();
+        }
     }
 
-    get(key) {
-        return this.sendCommand(`GET ${key}`);
+    // Utilize async/await for set, get, and del methods if needed
+    async set(key, value) {
+        const safeValue = this.#convertInputToString(value);
+        return await this.sendCommand(`SET ${key} ${safeValue}`);
     }
 
-    del(key) {
-        return this.sendCommand(`DEL ${key}`);
+    async get(key) {
+        return await this.sendCommand(`GET ${key}`);
+    }
+
+    async del(key) {
+        return await this.sendCommand(`DEL ${key}`);
     }
 
     close() {
