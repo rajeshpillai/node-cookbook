@@ -1,33 +1,60 @@
 const net = require("net");
-const { Mutex} = require("async-mutex");
+const { Mutex } = require("async-mutex");
 
-const data_store = {};
-const data_locks = new Map();
-const mutex = new Mutex() ;
+const dataStore = {};
+const keyLocks = new Map(); // Stores locks for each key
 
-let release = null;
-const server = net.createServer(async(socket) => {
-  socket.on("data", async (data) => { 
-    const [command, key, ...value] = data.toString().trim().split(" ");
+// Helper function to get or create a lock for a specific key
+function getLockForKey(key) {
+  if (!keyLocks.has(key)) {
+    keyLocks.set(key, new Mutex());
+  }
+  return keyLocks.get(key);
+}
+
+const server = net.createServer(async (socket) => {
+  socket.on("data", async (data) => {
+    const [command, key, ...valueParts] = data.toString().trim().split(" ");
+    const value = valueParts.join(" "); // Re-join the remaining parts for the value
+
     switch (command) {
       case "SET":
-        release = await mutex.acquire();
-        console.log("CACHE SERVER: ", value);
-        data_store[key] = value.join(" ");
-        release();
-        socket.write("OK\n");
+        try {
+          const lock = getLockForKey(key);
+          const release = await lock.acquire();
+          try {
+            dataStore[key] = value;
+            socket.write("OK\n");
+          } finally {
+            release();
+          }
+        } catch (error) {
+          console.error("Error handling SET command:", error);
+          socket.write("ERROR\n");
+        }
         break;
       case "GET":
-        release = await mutex.acquire();
-        socket.write(`${data_store[key]}\n`);
-        release();
+        try {
+          const lock = getLockForKey(key);
+          const release = await lock.acquire();
+          try {
+            const storedValue = dataStore[key] || "NOT FOUND";
+            socket.write(`${storedValue}\n`);
+          } finally {
+            release();
+          }
+        } catch (error) {
+          console.error("Error handling GET command:", error);
+          socket.write("ERROR\n");
+        }
         break;
       default:
         socket.write("Unknown command\n");
     }
   });
 });
+
 const PORT = 7070;
-server.listen(7070, () => {
-  console.log(`Cache srver running on port ${PORT}`);
+server.listen(PORT, () => {
+  console.log(`Cache server running on port ${PORT}`);
 });
