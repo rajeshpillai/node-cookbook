@@ -1,22 +1,18 @@
-require('dotenv').config();
-
 const net = require('net');
 const tls = require('tls');
 
 // Define your SMTP server details
 
-const smtpHost = process.env.SMTP_SERVER;
-const smtpPort = process.env.SMTP_PORT;
-const secure = process.env.SMTP_SECURE;
-const from = process.env.FROM_EMAIL;
-let password = process.env.EMAIL_PASSWORD;
+const smtpHost = 'smtp.mail.yahoo.com';
+const smtpPort = 587; // Default SMTP port for TLS
 
-
-const username = Buffer.from(from, 'utf8').toString('base64');
-password = Buffer.from(password, 'utf8').toString('base64');
+const username = Buffer.from("devbootcamp24x7@yahoo.com", 'utf8').toString('base64');
+const password = Buffer.from("uuiznvqfwhiiqrjy", 'utf8').toString('base64');
 
 // Create a socket connection to the SMTP server
 const client = net.createConnection(smtpPort, smtpHost);
+
+const secure = true;
 
 client.on('connect', () => {
   console.log('Connected to SMTP server');
