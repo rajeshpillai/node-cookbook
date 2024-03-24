@@ -1,4 +1,6 @@
 const net = require('net');
+const SERVER_PORT = 7000;
+
 const server = net.createServer((socket) => {
   console.log('Client connected...');
   socket.on('data', (data) => {
@@ -15,8 +17,8 @@ server.on('error', (err) => {
   throw err;
 });
 
-server.listen(7000, () => {
-  console.log('Server listening on port 7000');
+server.listen(SERVER_PORT, () => {
+  console.log(`Server listening on port ${SERVER_PORT}`);
 });
 
 
