@@ -8,4 +8,5 @@ CD into respective folder and execute the server and client code in different te
 # Utilities and code
 - [X] TCP 
 - [X] UDP
+- [ ] Centralized Cache
 - [ ] Email (in progress: TLS certificate mismatch error) - Refer nodemailer source code.
