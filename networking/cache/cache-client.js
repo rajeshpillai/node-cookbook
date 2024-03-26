@@ -47,11 +47,11 @@ class CacheClient {
     async sendCommand(command) {
         const id = uuidv4(); // this.currentId++;
         const commandWithId = `${id} ${command}`; // Prepend the ID to the command
-
+        console.log(`Returning promise for command: ${commandWithId}`);
         return new Promise((resolve, reject) => {
             this.pendingCommands.set(id.toString(), { resolve, reject });
             console.log(`Sending command:  ${commandWithId}`)
-            this.client.write(`${commandWithId}\r\n`);
+            this.client.write(`${commandWithId}\n`);
         });
     }
 

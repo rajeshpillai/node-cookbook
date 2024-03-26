@@ -14,6 +14,10 @@ function getLockForKey(key) {
 
 
 const server = net.createServer(async (socket) => {
+  socket.on("error", (error) => {
+    console.error("Socket error:", error);
+  });
+
   socket.on("data", async (data) => {
     console.log(`Received data: ${data}`);
     // First split to separate the ID from the rest of the command

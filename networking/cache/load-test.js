@@ -17,7 +17,7 @@ async function loadTest() {
     // Test SET operation
     startTime = performance.now();
 
-    const operations = Array.from({ length: OPERATIONS_COUNT }, (_, i) => {
+    const operations = Array.from({ length: OPERATIONS_COUNT }, async (_, i) => {
         console.log(`Setting key${i} to value${i}`);
         let result =  cache.set(`key${i}`, `value${i}`);
         return result;
