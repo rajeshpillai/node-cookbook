@@ -12,10 +12,6 @@ function getLockForKey(key) {
   return keyLocks.get(key);
 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 
 const server = net.createServer(async (socket) => {
   socket.on("data", async (data) => {

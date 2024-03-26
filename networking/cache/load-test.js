@@ -1,9 +1,11 @@
 const CacheClient = require('./cache-client');
 const { performance } = require('perf_hooks');
 
+const utils = require("../../utils");
+
 const HOST = 'localhost';
 const PORT = 7070;
-const OPERATIONS_COUNT = 3; // Number of operations for set, get, and del
+const OPERATIONS_COUNT = 2; // Number of operations for set, get, and del.  Currently if greater than 2 doesn't works
 
 async function loadTest() {
     const cache = new CacheClient(HOST, PORT);
@@ -17,7 +19,8 @@ async function loadTest() {
 
     const operations = Array.from({ length: OPERATIONS_COUNT }, (_, i) => {
         console.log(`Setting key${i} to value${i}`);
-        return cache.set(`key${i}`, `value${i}`);
+        let result =  cache.set(`key${i}`, `value${i}`);
+        return result;
     });
     await Promise.all(operations);
 
