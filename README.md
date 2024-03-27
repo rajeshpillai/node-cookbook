@@ -8,6 +8,7 @@ CD into respective folder and execute the server and client code in different te
 # Utilities and code
 - [X] TCP 
 - [X] UDP
+- [X] Basic TCP cache with locks
 - [ ] Centralized Cache
   - [ ] Delete is not yet handled
 - [ ] Email (in progress: TLS certificate mismatch error) - Refer nodemailer source code.
