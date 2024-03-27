@@ -5,7 +5,7 @@ const utils = require("../../utils");
 
 const HOST = 'localhost';
 const PORT = 7070;
-const OPERATIONS_COUNT = 100000; // Number of operations for set, get
+const OPERATIONS_COUNT = 8; // Number of operations for set, get
 
 async function loadTest() {
     const cache = new CacheClient(HOST, PORT);

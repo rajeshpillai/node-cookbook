@@ -1,5 +1,20 @@
 const net = require("net");
+const cluster = require("cluster");
+const numCPUs = require('os').cpus().length;
 const { Mutex } = require("async-mutex");
+
+if (cluster.isMaster) {
+  console.log(`Master ${process.pid} is running`);
+
+  // Fork workers.
+  for (let i = 0; i < numCPUs; i++) {
+      cluster.fork();
+  }
+
+  cluster.on('exit', (worker, code, signal) => {
+      console.log(`worker ${worker.process.pid} died`);
+  });
+} 
 
 const dataStore = {};
 const keyLocks = new Map(); // Stores locks for each key

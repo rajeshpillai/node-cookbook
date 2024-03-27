@@ -9,4 +9,5 @@ CD into respective folder and execute the server and client code in different te
 - [X] TCP 
 - [X] UDP
 - [X] Basic TCP cache with locks
+  -- [X] Enable cluster module
 - [ ] Email (in progress: TLS certificate mismatch error) - Refer nodemailer source code.
