@@ -5,7 +5,7 @@ const utils = require("../../utils");
 
 const HOST = 'localhost';
 const PORT = 7070;
-const OPERATIONS_COUNT = 2; // Number of operations for set, get, and del.  Currently if greater than 2 doesn't works
+const OPERATIONS_COUNT = 10000; // Number of operations for set, get
 
 async function loadTest() {
     const cache = new CacheClient(HOST, PORT);
@@ -17,24 +17,31 @@ async function loadTest() {
     // Test SET operation
     startTime = performance.now();
 
-    const operations = Array.from({ length: OPERATIONS_COUNT }, async (_, i) => {
-        console.log(`Setting key${i} to value${i}`);
-        let result =  cache.set(`key${i}`, `value${i}`);
-        return result;
-    });
-    await Promise.all(operations);
 
-    console.log("Keys added for load testing...");
+    async function performSetOperations(OPERATIONS_COUNT) {
+        for (let i = 0; i < OPERATIONS_COUNT; i++) {
+            console.log(`Setting key${i} to value${i}`);
+            await cache.set(`key${i}`, `value${i}`);
+            // await utils.sleep(100); // Wait for 100 ms before proceeding to the next iteration
+        }
+    }
+    
+    await performSetOperations(OPERATIONS_COUNT)
+    
     endTime = performance.now();
     console.log(`SET: Completed ${OPERATIONS_COUNT} operations in ${(endTime - startTime).toFixed(2)}ms`);
 
     //Test GET operation
     startTime = performance.now();
-    await Promise.all(
-        Array.from({ length: OPERATIONS_COUNT }, (_, i) =>
-            cache.get(`key${i}`)
-        )
-    );
+    async function performGetOperations(OPERATIONS_COUNT) {
+        for (let i = 0; i < OPERATIONS_COUNT; i++) {
+            console.log(`Getting key${i} to value${i}`);
+            await cache.get(`key${i}`);
+            // await utils.sleep(100); // Wait for 100 ms before proceeding to the next iteration
+        }
+    }
+    
+    await performGetOperations(OPERATIONS_COUNT);
     endTime = performance.now();
     console.log(`GET: Completed ${OPERATIONS_COUNT} operations in ${(endTime - startTime).toFixed(2)}ms`);
 
@@ -48,6 +55,7 @@ async function loadTest() {
     // endTime = performance.now();
     // console.log(`DEL: Completed ${OPERATIONS_COUNT} operations in ${(endTime - startTime).toFixed(2)}ms`);
 
+    console.log("ALL TEST COMPLETED");
     cache.close();
 }
 

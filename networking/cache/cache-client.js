@@ -17,20 +17,18 @@ class CacheClient {
 
             // Persistent listener for data events
             this.client.on('data', (dataBuffer) => {
-                console.log(`Received data: ${dataBuffer.toString()}`);
+                // console.log(`Received data: ${dataBuffer.toString()}`);
                 // Simple example assuming responses end with newline characters
                 const responses = dataBuffer.toString().trim().split('\n');
                 for (const response of responses) {
                     const [id, status, ...responseDataParts] = response.split(' ');
                     const responseData = responseDataParts.join(' ');
-                    console.log(`Received response for ID ${id}: ${status} - ${responseData}`);
+                    // console.log(`Received response for ID ${id}: ${status} - ${responseData}`);
                     if (this.pendingCommands.has(id)) {
                         const { resolve, reject } = this.pendingCommands.get(id);
                         if (status === 'OK') {
-                            console.log("RESOLVED");
                             resolve(responseData);
                         } else {
-                            console.log("REJECTED");
                             reject(new Error(`Command failed with status: ${status} for ID ${id}: ${responseData}`));
                         }
                         this.pendingCommands.delete(id);
@@ -38,7 +36,6 @@ class CacheClient {
                         console.error(`No pending command found for ID ${id}`);
                     }
                 }
-                console.log("One cycle done...");
             });
         });
     }
@@ -47,10 +44,10 @@ class CacheClient {
     async sendCommand(command) {
         const id = uuidv4(); // this.currentId++;
         const commandWithId = `${id} ${command}`; // Prepend the ID to the command
-        console.log(`Returning promise for command: ${commandWithId}`);
+        // console.log(`Returning promise for command: ${commandWithId}`);
         return new Promise((resolve, reject) => {
             this.pendingCommands.set(id.toString(), { resolve, reject });
-            console.log(`Sending command:  ${commandWithId}`)
+            // console.log(`Sending command:  ${commandWithId}`)
             this.client.write(`${commandWithId}\n`);
         });
     }
