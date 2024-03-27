@@ -5,7 +5,7 @@ const utils = require("../../utils");
 
 const HOST = 'localhost';
 const PORT = 7070;
-const OPERATIONS_COUNT = 10000; // Number of operations for set, get
+const OPERATIONS_COUNT = 100000; // Number of operations for set, get
 
 async function loadTest() {
     const cache = new CacheClient(HOST, PORT);
@@ -20,7 +20,7 @@ async function loadTest() {
 
     async function performSetOperations(OPERATIONS_COUNT) {
         for (let i = 0; i < OPERATIONS_COUNT; i++) {
-            console.log(`Setting key${i} to value${i}`);
+            // console.log(`Setting key${i} to value${i}`);
             await cache.set(`key${i}`, `value${i}`);
             // await utils.sleep(100); // Wait for 100 ms before proceeding to the next iteration
         }
@@ -35,7 +35,7 @@ async function loadTest() {
     startTime = performance.now();
     async function performGetOperations(OPERATIONS_COUNT) {
         for (let i = 0; i < OPERATIONS_COUNT; i++) {
-            console.log(`Getting key${i} to value${i}`);
+            // console.log(`Getting key${i} to value${i}`);
             await cache.get(`key${i}`);
             // await utils.sleep(100); // Wait for 100 ms before proceeding to the next iteration
         }
